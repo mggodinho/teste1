@@ -6,8 +6,12 @@
 
 package controle;
 
+import dao.LoginDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -28,20 +32,29 @@ public class ControleLogin extends HttpServlet {
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
+     * @throws java.lang.ClassNotFoundException
+     * @throws java.sql.SQLException
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+            throws ServletException, IOException, ClassNotFoundException, SQLException {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
         Login l = new Login();
             // l.setId(Long.parseLong(request.getParameter("id")));
-            l.setNome(request.getParameter("nome"));
-            l.setSenha(request.getParameter("senha"));
+            l.setNome(request.getParameter("txnome"));
+            l.setSenha(request.getParameter("txsenha"));
+        LoginDAO ldao = new LoginDAO();
         try {
             /* TODO output your page here. You may use following sample code. */
-            
-            response.sendRedirect("sucesso.jsp");
-        } finally {
+            int quantos = ldao.VerificaLogin(l);
+            if (quantos > 0) {
+                response.sendRedirect("sucesso.jsp");
+            } else {
+                response.sendRedirect("erro.jsp");
+            }
+        } catch (SQLException ex){
+            throw new RuntimeException(ex);
+        }            finally {
             out.close();
         }
     }
@@ -58,7 +71,13 @@ public class ControleLogin extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        try {
+            processRequest(request, response);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(ControleLogin.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(ControleLogin.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -72,7 +91,13 @@ public class ControleLogin extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        try {
+            processRequest(request, response);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(ControleLogin.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(ControleLogin.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
